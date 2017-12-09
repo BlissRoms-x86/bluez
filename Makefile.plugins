@@ -22,9 +22,6 @@ builtin_sources += profiles/sap/main.c profiles/sap/manager.h \
 			profiles/sap/manager.c profiles/sap/server.h \
 			profiles/sap/server.c profiles/sap/sap.h \
 			profiles/sap/sap-dummy.c
-
-noinst_LIBRARIES += profiles/sap/libsap.a
-profiles_sap_libsap_a_SOURCES = profiles/sap/sap.h profiles/sap/sap-u8500.c
 endif
 
 if A2DP
@@ -61,7 +58,7 @@ builtin_modules += input
 builtin_sources += profiles/input/manager.c \
 			profiles/input/server.h profiles/input/server.c \
 			profiles/input/device.h profiles/input/device.c \
-			profiles/input/hidp_defs.h
+			profiles/input/hidp_defs.h profiles/input/sixaxis.h
 endif
 
 if HOG
@@ -102,6 +99,9 @@ builtin_sources += profiles/midi/midi.c \
 			profiles/midi/libmidi.c
 builtin_ldadd += @ALSA_LIBS@
 endif
+
+builtin_modules += battery
+builtin_sources += profiles/battery/battery.c
 
 if SIXAXIS
 plugin_LTLIBRARIES += plugins/sixaxis.la

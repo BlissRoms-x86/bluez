@@ -485,8 +485,7 @@ static bool can_write_data(struct io *io, void *user_data)
 	case ATT_OP_TYPE_RSP:
 		/* Set in_req to false to indicate that no request is pending */
 		att->in_req = false;
-
-		/* Fall through to the next case */
+		/* fall through */
 	case ATT_OP_TYPE_CMD:
 	case ATT_OP_TYPE_NOT:
 	case ATT_OP_TYPE_CONF:
@@ -901,12 +900,12 @@ static bool can_read_data(struct io *io, void *user_data)
 		}
 
 		att->in_req = true;
-
-		/* Fall through to the next case */
+		/* fall through */
 	case ATT_OP_TYPE_CMD:
 	case ATT_OP_TYPE_NOT:
 	case ATT_OP_TYPE_UNKNOWN:
 	case ATT_OP_TYPE_IND:
+		/* fall through */
 	default:
 		/* For all other opcodes notify the upper layer of the PDU and
 		 * let them act on it.
@@ -1203,6 +1202,17 @@ bool bt_att_unregister_disconnect(struct bt_att *att, unsigned int id)
 
 	if (!att || !id)
 		return false;
+
+	/* Check if disconnect is running */
+	if (!att->io) {
+		disconn = queue_find(att->disconn_list, match_disconn_id,
+							UINT_TO_PTR(id));
+		if (!disconn)
+			return false;
+
+		disconn->removed = true;
+		return true;
+	}
 
 	disconn = queue_remove_if(att->disconn_list, match_disconn_id,
 							UINT_TO_PTR(id));
