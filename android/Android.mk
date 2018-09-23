@@ -26,14 +26,19 @@ BLUEZ_COMMON_CFLAGS += -Wall -Wextra \
 			-Wdeclaration-after-statement \
 			-Wmissing-declarations \
 			-Wredundant-decls \
-			-Wcast-align \
+			-Wno-cast-align \
 			-Werror \
 
 # Disable warnings enabled by Android but not enabled in autotools build
 BLUEZ_COMMON_CFLAGS += -Wno-pointer-arith \
-			-Wno-missing-field-initializers \
 			-Wno-maybe-uninitialized \
+		        -Wno-missing-field-initializers \
+                        -Wno-for-loop-analysis \
+                        -Wno-unused-function \
+                        -Wno-unused-label \
 			-Wno-unused-parameter \
+                        -Wno-unused-variable \
+
 
 ifeq ($(BOARD_HAVE_BLUETOOTH_BLUEZ),true)
 #
@@ -727,6 +732,8 @@ LOCAL_SRC_FILES := \
 
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/bluez \
+
+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := rtk_hciattach
