@@ -449,19 +449,6 @@ static void h5_crc_update(RT_U16 *crc, RT_U8 d)
     *crc = reg;
 }
 
-struct __una_u16 { RT_U16 x; };
-static __inline RT_U16 __get_unaligned_cpu16(const void *p)
-{
-    const struct __una_u16 *ptr = (const struct __una_u16 *)p;
-    return ptr->x;
-}
-
-
-static __inline RT_U16 get_unaligned_be16(const void *p)
-{
-    return __get_unaligned_cpu16((const RT_U8 *)p);
-}
-
 static __inline RT_U16 get_unaligned_le16(RT_U8 *p)
 {
     return (RT_U16)(*p)+((RT_U16)(*(p+1))<<8);
@@ -743,7 +730,7 @@ static void h5_remove_acked_pkt(rtk_hw_cfg_t *h5)
     }
 
     //skb_queue_walk_safe(&h5->unack, skb, tmp) // remove ack'ed packet from h5->unack queue
-    for (i = 0; i < 5; ++i) {
+    while (i < 5) {
         if (i >= pkts_to_be_removed)
             break;
         i++;
@@ -808,7 +795,10 @@ static void hci_event_cmd_complete(struct sk_buff* skb)
         status = skb->data[0];
         RS_DBG("Read BD Address with Status:%x", status);
         if (!status) {
-            RS_DBG("BD Address: %8x%8x", *(int*)&skb->data[1], *(int*)&skb->data[5]);
+            int a1, a2;
+            memcpy(&a1, &skb->data[1], sizeof(int));
+            memcpy(&a2, &skb->data[5], sizeof(int));
+            RS_DBG("BD Address: %8x%8x", a1, a2);
         }
         break;
 
@@ -1390,9 +1380,9 @@ static int rtk_vendor_change_speed_h4(int fd, RT_U32 baudrate)
 
     baudrate = cpu_to_le32(baudrate);
 #ifdef BAUDRATE_4BYTES
-    memcpy((RT_U16*)&cmd[4], &baudrate, 4);
+    memcpy(&cmd[4], &baudrate, 4);
 #else
-    memcpy((RT_U16*)&cmd[4], &baudrate, 2);
+    memcpy(&cmd[4], &baudrate, 2);
     cmd[6] = 0;
     cmd[7] = 0;
 #endif
@@ -1600,7 +1590,6 @@ int rtk_get_bt_config(unsigned char** config_buf, RT_U32* config_baud_rate)
     }
 #endif
 
-GET_CONFIG:
     ret = sprintf(bt_config_file_name, BT_CONFIG_DIRECTORY"rtlbt_config");
     if (stat(bt_config_file_name, &st) < 0) {
         RS_ERR("can't access bt config file:%s, errno:%d\n", bt_config_file_name, errno);
@@ -1664,9 +1653,9 @@ int rtk_vendor_change_speed_h5(int fd, RT_U32 baudrate)
 
     baudrate = cpu_to_le32(baudrate);
 #ifdef BAUDRATE_4BYTES
-    memcpy((RT_U16*)&cmd[3], &baudrate, 4);
+    memcpy(&cmd[3], &baudrate, 4);
 #else
-    memcpy((RT_U16*)&cmd[3], &baudrate, 2);
+    memcpy(&cmd[3], &baudrate, 2);
 
     cmd[5] = 0;
     cmd[6] = 0;

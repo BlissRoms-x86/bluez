@@ -733,7 +733,7 @@ LOCAL_SRC_FILES := \
 LOCAL_C_INCLUDES := \
 	$(LOCAL_PATH)/bluez \
 
-LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS)
+LOCAL_CFLAGS := $(BLUEZ_COMMON_CFLAGS) -Wno-unused-variable
 
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := rtk_hciattach
